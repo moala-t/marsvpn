@@ -167,7 +167,7 @@ class LoadingMessageState extends State<LoadingMessage>
       height: 160,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20.0),
-        color: Colors.grey[800], // Replace with your custom color
+        color: CustomColors.background60, // Replace with your custom color
       ),
       child: Center(
         child: Column(
@@ -220,7 +220,7 @@ void showToast(String text, String mode, FToast fToast) async {
       child: LoadingMessage(
         text: text,
       ),
-      toastDuration: Duration(seconds: 60),
+      toastDuration: Duration(seconds: 10),
       gravity: ToastGravity.CENTER,
     );
   }

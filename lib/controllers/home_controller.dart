@@ -206,6 +206,16 @@ class HomeController extends GetxController {
     }
   }
 
+  updateConfigIsConnected(id, isConnected) async {
+    print("id $id updated to $isConnected");
+    final isConnectedData =
+        await pubApi.updateConfigIsConnected(id, isConnected);
+    if (isConnectedData != null) {
+      return true;
+    }
+    return false;
+  }
+
   fetchPremiumServers() async {
     final servers_ = await authApi.fetchPremiumServers();
     if (servers_ != null) {
@@ -269,10 +279,14 @@ class HomeController extends GetxController {
     for (var config in server['configs']) {
       if (config['is_connected'] == false &&
           config['is_server_config'] == false) {
-        final configStr = await downloadAndReadFile(config['file']);
+        final confFile = await downloadAndReadFile(config['file']);
         final ipAddress = server['ip_address'];
         final port = config['protocol']['port'];
-        return {'config': configStr, 'ip_address': '$ipAddress:$port'};
+        return {
+          'config': config,
+          'confFile': confFile,
+          'ip_address': '$ipAddress:$port'
+        };
       }
     }
     return null;
@@ -292,13 +306,15 @@ class HomeController extends GetxController {
     }
 
     final config = await selectProperConfig(server_!);
-    print(config);
-    pingPong();
+    // pingPong();
     if (config != null) {
+      print(config['confFile']);
+      await saveInteger('lastConnectedConfigId', config['config']['id']);
+      await updateConfigIsConnected(config['config']['id'], true);
       try {
         await wireguard.startVpn(
           serverAddress: config['ip_address'],
-          wgQuickConfig: config['config'],
+          wgQuickConfig: config['confFile'],
           providerBundleIdentifier: 'com.moallatakhtdar.marsvpn',
         );
       } catch (error, stack) {
@@ -310,6 +326,8 @@ class HomeController extends GetxController {
   void disconnectVpn() async {
     try {
       await wireguard.stopVpn();
+      updateConfigIsConnected(
+          await loadInteger('lastConnectedConfigId'), false);
     } catch (e, str) {
       debugPrint('Failed to disconnect $e\n$str');
     }

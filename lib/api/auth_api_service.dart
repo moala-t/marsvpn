@@ -3,8 +3,8 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthApiService {
-  final String baseUrl = 'http://172.20.10.3:8000';
-  final int maxRetries = 1; // Maximum number of retry attempts
+  final String baseUrl = 'http://mars.x0x1.lol/';
+  final int maxRetries = 2; // Maximum number of retry attempts
 
   AuthApiService();
 

@@ -4,7 +4,7 @@ import '../utils/utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PubApiService {
-  final String baseUrl = 'http://172.20.10.3:8000';
+  final String baseUrl = 'http://mars.x0x1.lol/';
 
   final Map<String, String> headers = {
     'Content-Type': 'application/json',
@@ -26,6 +26,26 @@ class PubApiService {
       }
     } catch (e) {
       print('Failed to load servers. Error: $e');
+      return null;
+    }
+  }
+
+  Future<dynamic> updateConfigIsConnected(id, isConnected) async {
+    try {
+      final response = await http.patch(
+        Uri.parse('$baseUrl/configs/$id/is_connected/'),
+        headers: headers,
+        body: jsonEncode({'is_connected': isConnected}),
+      );
+
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      } else {
+        print('Failed to update config: ${response.statusCode}');
+        return null;
+      }
+    } catch (e) {
+      print('Failed to update config. Error: $e');
       return null;
     }
   }
